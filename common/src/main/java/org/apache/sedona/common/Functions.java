@@ -37,6 +37,7 @@ import org.locationtech.jts.operation.linemerge.LineMerger;
 import org.locationtech.jts.operation.valid.IsSimpleOp;
 import org.locationtech.jts.operation.valid.IsValidOp;
 import org.locationtech.jts.precision.GeometryPrecisionReducer;
+import org.locationtech.jts.simplify.TopologyPreservingSimplifier;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -575,4 +576,22 @@ public class Functions {
         }
         return S2Utils.roundCellsToSameLevel(new ArrayList<>(cellIds), level).stream().map(S2CellId::id).collect(Collectors.toList()).toArray(new Long[cellIds.size()]);
     }
+
+    // create static function named simplifyPreserveTopology
+    public static Geometry simplifyPreserveTopology(Geometry geometry, double distanceTolerance) {
+        return TopologyPreservingSimplifier.simplify(geometry, distanceTolerance);
+    }
+
+    public static String geometryType(Geometry geometry) {
+        return "ST_" + geometry.getGeometryType();
+    }
+
+    public static Geometry startPoint(Geometry geometry) {
+        if (geometry instanceof LineString) {
+            LineString line = (LineString) geometry;
+            return line.getStartPoint();
+        }
+        return null;
+    }
+
 }

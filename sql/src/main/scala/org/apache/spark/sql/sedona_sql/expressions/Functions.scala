@@ -310,7 +310,7 @@ case class ST_IsSimple(inputExpressions: Seq[Expression])
   *                         second arg is distance tolerance for the simplification(all vertices in the simplified geometry will be within this distance of the original geometry)
   */
 case class ST_SimplifyPreserveTopology(inputExpressions: Seq[Expression])
-  extends InferredBinaryExpression(TopologyPreservingSimplifier.simplify) with FoldableExpression {
+  extends InferredBinaryExpression(Functions.simplifyPreserveTopology) with FoldableExpression {
 
   protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]) = {
     copy(inputExpressions = newChildren)
@@ -383,7 +383,7 @@ case class ST_GeometryType(inputExpressions: Seq[Expression])
   extends UnaryGeometryExpression with FoldableExpression with CodegenFallback {
 
   override protected def nullSafeEval(geometry: Geometry): Any = {
-    UTF8String.fromString("ST_" + geometry.getGeometryType)
+    UTF8String.fromString(Functions.geometryType(geometry))
   }
 
   override def dataType: DataType = StringType
@@ -447,12 +447,7 @@ case class ST_StartPoint(inputExpressions: Seq[Expression])
   extends UnaryGeometryExpression with FoldableExpression with CodegenFallback {
 
   override protected def nullSafeEval(geometry: Geometry): Any = {
-    geometry match {
-      case line: LineString => {
-        line.getPointN(0)
-      }
-      case _ => null
-    }
+    Functions.startPoint(geometry)
   }
 
   override def dataType: DataType = GeometryUDT
